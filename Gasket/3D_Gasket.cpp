@@ -91,7 +91,7 @@ void divide_tetra(GLfloat *a, GLfloat *b, GLfloat *c, GLfloat *d, int m)
         for (j=0; j<3; j++) ad[j] = (a[j] + d[j]) / 2.0;
         for (j=0; j<3; j++) bd[j] = (b[j] + d[j]) / 2.0;
         for (j=0; j<3; j++) cd[j] = (c[j] + d[j]) / 2.0;
-        
+
         divide_tetra(a, ab, ac, ad, m - 1);
         divide_tetra(ab, b, bc, bd, m - 1);
         divide_tetra(ac, bc, c, cd, m - 1);
@@ -105,7 +105,7 @@ void divide_tetra(GLfloat *a, GLfloat *b, GLfloat *c, GLfloat *d, int m)
 void track_ptov(int x, int y, int width, int height, float v[3])
 {
     float d, a;
-    
+
     v[0] = (2.0f * x - width) / width;
     v[1] = (height - 2.0f * y) / height;
     d = (float)sqrt(v[0] * v[0] + v[1] * v[1]);
@@ -122,11 +122,11 @@ void mouseMotion(int x, int y)
 {
     float curPos[3], dx, dy, dz;
     track_ptov(x, y, winWidth, winHeight, curPos);
-    
+
     dx = curPos[0] - lastPos[0];
     dy = curPos[1] - lastPos[1];
     dz = curPos[2] - lastPos[2];
-    
+
     if (dx || dy || dz)  // 鼠标拖动
     {
         angle = 90.0f * sqrt(dx * dx + dy * dy + dz * dz);
@@ -134,12 +134,12 @@ void mouseMotion(int x, int y)
         axis[0] = lastPos[1] * curPos[2] - lastPos[2] * curPos[1];
         axis[1] = lastPos[2] * curPos[0] - lastPos[0] * curPos[2];
         axis[2] = lastPos[0] * curPos[1] - lastPos[1] * curPos[0];
-        
+
         lastPos[0] = curPos[0];
         lastPos[1] = curPos[1];
         lastPos[2] = curPos[2];
     }
-    
+
     glutPostRedisplay();
 }
 
@@ -151,7 +151,7 @@ void startMotion(int x, int y)
     startX = x; startY = y;
     curX = x; curY = y;
     track_ptov(x, y, winWidth, winHeight, lastPos);
-    
+
 }
 
 
@@ -186,25 +186,25 @@ void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
-    
+
     glLoadIdentity();
-    
+
     // 设置视点相机位置
     gluLookAt(0, 0, Zeye,  0, 0, 0,  0, 1, 0);
     glGetFloatv(GL_MODELVIEW_MATRIX, p_Mlookup);
-    
+
     glLoadIdentity();
     glRotatef(angle, axis[0], axis[1], axis[2]);
     glMultMatrixf(p_CompositeTransMatrix);
     glGetFloatv(GL_MODELVIEW_MATRIX, p_CompositeTransMatrix);
-    
+
     glLoadMatrixf(p_Mlookup);
     glMultMatrixf(p_CompositeTransMatrix);
-    
+
     glBegin(GL_TRIANGLES);
     divide_tetra(v[0], v[1], v[2], v[3], n);
     glEnd();
-    
+
     // 立即显示
     glFlush();
 }
@@ -217,7 +217,7 @@ void myidle()
         angle = 0.1;
         glutPostRedisplay();
     }
-    
+
 }
 
 
@@ -252,7 +252,7 @@ void Perspective(int w, int h)
         glFrustum(-2.0 * (GLfloat)w / (GLfloat)h,
                   2.0 * (GLfloat)w / (GLfloat)h, -2.0, 2.0, near, far);
     glutPostRedisplay();
-    
+
     // 使得跟踪球交互操作正确
     winWidth = w;
     winHeight = h;
@@ -273,7 +273,7 @@ void Orthographic(int w, int h)
                 2.0 * (GLfloat)w / (GLfloat)h, -2.0, 2.0, near,far);
     glMatrixMode(GL_MODELVIEW);
     glutPostRedisplay();
-    
+
     // 使得跟踪球交互操作正确
     winWidth = w;
     winHeight = h;
@@ -329,23 +329,23 @@ int main(int argc, char **argv)
     glutInitWindowSize(winWidth, winHeight);
     glutInitWindowPosition(100, 100);
     glutCreateWindow("3D Gasket");
-    
+
     glutReshapeFunc(myReshape);
     glutDisplayFunc(display);
-    
+
     glutIdleFunc(myidle);
     glutKeyboardFunc(keyboard);
     glutMouseFunc(myMouse);
     glutMotionFunc(mouseMotion);
-    
+
     glutCreateMenu(Draw_menu);
     glutAddMenuEntry("Orthographic", 1);
     glutAddMenuEntry("Perspective", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
-    
+
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_FLAT);
     glClearColor(0.0, 0.0, 0.0, 1.0);
-    
+
     glutMainLoop();
 }
